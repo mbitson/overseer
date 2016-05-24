@@ -1,0 +1,29 @@
+<md-content flex layout="column" layout-padding layout-margin ng-controller="timelineCtrl">
+    <md-list layout="column">
+        <md-divider ng-repeat-start="day in daysWithEvents"></md-divider>
+        <md-list-item ng-repeat-end layout="row" layout-align="start start">
+            <div class="timeline-left" layout="column" layout-align="end start" layout-padding>
+                <span class="timeline-day">{{day | date : 'EEEE'}}</span>
+                <span class="timeline-date">{{day | date : 'MMMM d'}}</span>
+            </div>
+            <div flex class="timeline-right" layout="column" layout="start center">
+                <div layout="row" ng-repeat="event in events | filter:{Created:day}" class="timeline-event">
+                    <div layout="row" layout-align="start center">
+                        <ng-md-icon class="action-icon" ng-if="!event.Action.toLowerCase().indexOf('user.')" icon="account_circle" style="fill: #8DC38F" size="40"
+                        "></ng-md-icon>
+                        <ng-md-icon class="action-icon" ng-if="!event.Action.toLowerCase().indexOf('site.')" icon="cloud_circle" style="fill: #83BDC3" size="40"
+                        "></ng-md-icon>
+                        <ng-md-icon class="action-icon" ng-if="!event.Action.toLowerCase().indexOf('monitor.')" icon="vpn_lock" style="fill: #af97c3" size="40"
+                        "></ng-md-icon>
+                    </div>
+                    <div layout="column" layout-align="center start">
+                        <div flex>
+                            <span class="timeline-action">{{event.Action}}</span>
+                            <span class="timeline-ip">On: {{event.Date | date : 'shortTime'}} | From: {{event.Ip}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </md-list-item>
+    </md-list>
+</md-content>

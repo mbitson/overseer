@@ -1,0 +1,27 @@
+<div layout="row" layout-margin>
+    <div flex layout="column">
+        <md-toolbar class="md-accent" md-theme="darcula" layout-padding layout="row" layout-align="start center">
+            Alerts for {{site.Domain}}
+        </md-toolbar>
+        <md-content layout-padding>
+            <md-list>
+                <md-list-item layout="row" class="alert-heading">
+                    <div flex>Name</div>
+                    <div flex>Email</div>
+                    <div flex>SMS</div>
+                    <div flex>Urgency</div>
+                    <div flex>Last Notification Triggered</div>
+                </md-list-item>
+                <md-divider></md-divider>
+                <md-list-item ng-repeat-start="alert in alerts" layout="row" layout-align="start center" class="alert-row">
+                    <div flex>{{alert.Name}}</div>
+                    <div flex>{{alert.Email}}</div>
+                    <div flex>{{alert.Sms}}</div>
+                    <div flex>{{alert.Urgency}}</div>
+                    <div flex layout-align="start start">{{alert.Checked_date | date : "short"}}</div>
+                </md-list-item >
+                <md-divider ng-repeat-end></md-divider>
+            </md-list>
+        </md-content>
+    </div>
+</div>

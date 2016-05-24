@@ -1,0 +1,37 @@
+<div layout="row" layout-margin>
+    <div flex layout="column">
+        <md-toolbar class="md-accent" md-theme="darcula" layout-padding layout="row" layout-align="start center">
+            Monitors for {{site.Domain}}
+        </md-toolbar>
+        <md-content layout-padding>
+            <md-list>
+                <md-list-item layout="row" class="monitor-heading">
+                    <div flex>Name</div>
+                    <div flex>Monitor Type</div>
+                    <div flex>Interval</div>
+                    <div flex>Date Registered</div>
+                    <div flex>Last Checked</div>
+                </md-list-item>
+                <md-divider></md-divider>
+                <div ng-repeat-start="monitor in monitors" layout="column" layout-align="start start">
+                    <div ng-if="monitor.percentTo<=100" class="monitor-progress-bar" style="width: {{monitor.percentTo}}%;"></div>
+                    <div ng-if="monitor.percentTo>100||monitor.percentTo<1" class="monitor-progress-bar" style="width: 0;"></div>
+                    <md-list-item layout="row" flex layout-fill layout-align="start center" class="monitor-row" style="padding-top:16px; padding-bottom: 16px;">
+                        <div flex>{{monitor.Name}}</div>
+                        <div flex>{{monitor.Monitor_type.Name}}</div>
+                        <div flex layout="row" layout-align="start center">
+                            <span flex>{{monitor.Interval}}s</span>
+                        </div>
+                        <div flex>{{monitor.Created | date : "M/d/y"}}</div>
+                        <div flex layout-align="start start">{{monitor.Checked_date | date : "short"}}</div>
+                    </md-list-item>
+                </div>
+                <div ng-repeat-end>
+                    <div ng-if="monitor.percentTo<=100" class="monitor-progress-bar" style="width: {{monitor.percentTo}}%;"></div>
+                    <div ng-if="monitor.percentTo>100||monitor.percentTo<1" class="monitor-progress-bar" style="width: 0;"></div>
+                    <md-divider></md-divider>
+                </div>
+            </md-list>
+        </md-content>
+    </div>
+</div>

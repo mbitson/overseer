@@ -1,0 +1,31 @@
+<md-content aria-label="Account Settings" flex layout-margin layout-padding layout="row" layout-align="center center">
+	<form class="create-form" flex layout-margin layout-padding>
+		<md-toolbar class="md-accent">
+			<div class="md-toolbar-tools" >
+				<h2>Account Settings</h2>
+			</div>
+		</md-toolbar>
+		<div layout="column">
+			<div layout="column">
+				<div layout="row">
+					<md-toolbar class="md-primary md-nav-bar" md-theme="darcula" layout="row" layout-align="space-between center">
+						<div>
+							<md-button href="/#/settings/account" ng-class="{'md-nav-active': $state.includes('settings.account')}" ng-disabled="$state.is('settings.account')">
+								Account
+							</md-button>
+							<md-button href="/#/settings/contacts/list" ng-class="{'md-nav-active': $state.includes('settings.contacts')}" ng-disabled="$state.is('settings.contacts')">
+								Contacts
+							</md-button>
+							<md-button href="/#/settings/billing" ng-class="{'md-nav-active': $state.includes('settings.billing')}" ng-disabled="$state.is('settings.billing')">
+								Billing
+							</md-button>
+						</div>
+					</md-toolbar>
+				</div>
+			</div>
+			<md-content flex layout="row" layout-align="center center">
+				<div ui-view flex></div>
+			</md-content>
+		</div>
+	</form>
+</md-content>

@@ -1,0 +1,35 @@
+<md-content aria-label="Add A Contact" flex layout="column" layout-align="center center">
+	<md-toolbar class="md-accent" flex>
+		<div class="md-toolbar-tools">
+			<h2>Add A New Contact</h2>
+		</div>
+	</md-toolbar>
+	<md-content flex layout="column">
+		<h3>Contact Information</h3>
+		<small>Please enter basic information about this contact.</small>
+		<div flex layout="row">
+			<md-input-container flex="50">
+				<label>First Name</label>
+				<input name="contact['First']" ng-model="contact.First" />
+			</md-input-container>
+			<md-input-container flex="50">
+				<label>Last Name</label>
+				<input name="contact['Last']" ng-model="contact.Last" />
+			</md-input-container>
+		</div>
+		<md-input-container flex>
+			<label>Email</label>
+			<input name="contact['Email']" ng-model="contact.Email" />
+		</md-input-container>
+		<md-input-container flex>
+			<label>SMS</label>
+			<input name="contact['Sms']" ng-model="contact.Sms" />
+		</md-input-container>
+	</md-content>
+	<div class="md-actions" layout="row" layout-align="space-around center">
+		<span flex></span>
+		<md-button ng-click="add(contact)" class="md-primary md-raised" aria-label="Add Contact">
+			Save Contact
+		</md-button>
+	</div>
+</md-content>

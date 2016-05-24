@@ -1,0 +1,79 @@
+<div layout="row" layout-sm="column" layout-margin layout-wrap>
+    <div flex="24" flex-sm="100" flex-md="49" layout="column">
+        <md-toolbar class="md-accent" md-theme="darcula" layout-padding layout="row" layout-align="start center">
+            CMS Integration
+        </md-toolbar>
+        <md-content layout-padding>
+            <div flex layout="column" layout-align="center center">
+                <small class="soft-notice">
+                    No CMS integration for this domain.<br />
+                    <a href="/#/site/{{site.Id}}/cms">Click here to integrate a new CMS on this domain.</a>
+                </small>
+            </div>
+        </md-content>
+    </div>
+    <div flex="25" flex-sm="100" flex-md="50" layout="column">
+        <md-toolbar class="md-accent" md-theme="darcula" layout-padding layout="row" layout-align="space-between center">
+            <span>Availability</span>
+            <span flex></span>
+            <span class="chart-badge" ng-class="{'text-danger': (AvailabilityPercent<95), 'text-success': (AvailabilityPercent>=95)}">{{AvailabilityPercent}}%</span>
+        </md-toolbar>
+        <md-content layout-padding>
+            <canvas id="doughnut"
+                    class="chart chart-doughnut"
+                    data="AvailabilityData"
+                    labels="AvailabilityLabels"
+                    colours="AvailabilityColors"
+                    ></canvas>
+        </md-content>
+    </div>
+    <div flex="50" flex-sm="100" flex-md="99" layout="column">
+        <md-toolbar class="md-accent" md-theme="darcula" layout-padding layout="row" layout-align="start center">
+            <span>Recent Alert Notifications</span>
+            <span flex></span>
+            <small style="padding-left: 5px; font-size: 11px;"> Last 24 Hours</small>
+        </md-toolbar>
+        <md-content layout-padding>
+            <md-list ng-show="alerts.length > 0">
+                <md-list-item layout="row" class="alert-heading">
+                    <div flex>Name</div>
+                    <div flex>Email</div>
+                    <div flex>SMS</div>
+                    <div flex>Triggered</div>
+                </md-list-item>
+                <md-divider></md-divider>
+                <md-list-item ng-repeat-start="alert in alerts" layout="row" layout-align="start center">
+                    <div flex>{{alert.Name}}</div>
+                    <div flex>{{alert.Email}}</div>
+                    <div flex>{{alert.Sms}}</div>
+                    <div flex layout-align="start start">{{alert.Checked_date | date : "short"}}</div>
+                </md-list-item>
+                <md-divider ng-repeat-end></md-divider>
+            </md-list>
+            <div ng-hide="alerts.length > 0" flex layout="column" layout-align="center center">
+                <small class="soft-notice">No alerts triggered for this site in the last 24hrs.<br />
+                    <a href="/#/site/{{site.Id}}/alerts">View all active alerts for this domain.</a>
+                </small>
+            </div>
+        </md-content>
+    </div>
+</div>
+<div layout="row" layout-margin>
+    <div flex layout="column">
+        <md-toolbar class="md-accent" md-theme="darcula" layout-padding layout="row" layout-align="start center">
+            Server Monitoring Chart
+        </md-toolbar>
+        <md-content layout-padding>
+            <canvas
+                    id="site-overview-chart"
+                    class="chart chart-line"
+                    data="MonitoringData"
+                    labels="MonitoringLabels"
+                    legend="true"
+                    series="MonitoringSeries"
+                    height="40"
+                    options="{}">
+            </canvas>
+        </md-content>
+    </div>
+</div>

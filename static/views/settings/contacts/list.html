@@ -1,0 +1,60 @@
+<div layout="column">
+	<div flex layout="column">
+		<md-toolbar class="md-accent" md-theme="darcula" layout-padding layout="row" layout-align="start center">
+			Your Contacts
+			<small> - Create and manage account contacts.</small>
+		</md-toolbar>
+		<md-content layout-padding>
+			<md-list>
+				<md-list-item layout="row" class="monitor-heading">
+					<div flex>First Name</div>
+					<div flex>Last Name</div>
+					<div flex>Email</div>
+					<div flex>SMS</div>
+				</md-list-item>
+				<md-divider></md-divider>
+				<div ng-repeat="contact in contacts" layout="column" layout-align="start start">
+					<md-list-item layout="row" flex layout-fill layout-align="start center" class="monitor-row" style="padding-top:16px; padding-bottom: 16px;">
+						<div flex>{{contact.First}}</div>
+						<div flex>{{contact.Last}}</div>
+						<div flex>{{contact.Email}}</div>
+						<div flex>{{contact.Sms}}</div>
+					</md-list-item>
+				</div>
+			</md-list>
+			<md-button class="md-primary md-raised" href="/#/settings/contacts/create">
+				Add A Contact
+			</md-button>
+		</md-content>
+	</div>
+	<div flex layout="column">
+		<md-toolbar class="md-accent" md-theme="darcula" layout-padding layout="row" layout-align="start center">
+			Your Groups
+			<small> - Consider grouping contacts for easy batch assignment.</small>
+		</md-toolbar>
+		<md-content layout-padding>
+			<md-list>
+				<md-list-item layout="row" class="monitor-heading">
+					<div flex="30">Name</div>
+					<div flex="70">Contacts</div>
+				</md-list-item>
+				<md-divider></md-divider>
+				<div ng-repeat="group in groups" layout="column" layout-align="start start">
+					<md-list-item layout="row" flex layout-fill layout-align="start center" class="monitor-row" style="padding-top:16px; padding-bottom: 16px;">
+						<div flex="30">{{group.Name}}</div>
+						<div flex="70">
+							<select flex multiple
+									chosen
+									ng-model="group.Contacts"
+									ng-options="contact.Id as contact.Email for contact in contacts">
+							</select>
+						</div>
+					</md-list-item>
+				</div>
+			</md-list>
+			<md-button class="md-primary md-raised" href="/#/settings/contacts/group">
+				Add A Group
+			</md-button>
+		</md-content>
+	</div>
+</div>

@@ -1,0 +1,16 @@
+<md-content ng-controller="siteNavigationCtrl">
+    <md-toolbar class="md-accent" md-theme="darcula" layout-padding layout="row" layout-align="start center" ng-show="hasDownSites()">
+        Sites Needing Your Attention
+    </md-toolbar>
+    <div class="md-mini-list" flex layout="row" layout-wrap>
+        <div ng-repeat="site in sites" flex="15" ng-show="site.Status == 0">
+            <span class="md-list-item-inner">
+                <md-button ng-class="{'md-nav-active': false}" href="#/site/{{site.Id}}/dashboard">
+                    <div class="live-indicator live-indicator-mini" ng-class="{'live': site.Status == 1, 'down': site.Status == 0}"></div>
+                    {{site.Domain}}
+                    <md-tooltip>Manage {{site.Domain}}</md-tooltip>
+                </md-button>
+            </span>
+        </div>
+    </div>
+</md-content>

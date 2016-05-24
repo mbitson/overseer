@@ -1,0 +1,73 @@
+<md-content aria-label="Add A Site" flex layout-margin layout-padding layout="row" layout-align="center center">
+    <form class="create-form" flex style="max-width: 600px;">
+        <md-toolbar class="md-accent">
+            <div class="md-toolbar-tools">
+                <h2>Manage A New Domain</h2>
+            </div>
+        </md-toolbar>
+        <md-content layout="column" layout-padding>
+            <md-input-container flex>
+                <h3>Domain Information</h3>
+                <small>Enter your domain information and select the services you'd like to monitor.</small>
+                <label>Domain To Manage</label>
+                <input name="site['Domain']" ng-model="site.Domain" />
+            </md-input-container>
+            <div flex layout="row" layout-align="space-around center">
+                <span flex style="color: #7f7f7f;">Enable CMS Integration</span>
+                <span flex></span>
+                <div class="toggle-bg {{cmsIntegration}}">
+                    <input type="radio" name="toggle" value="off" ng-model="cmsIntegration">
+                    <input type="radio" name="toggle" value="on" ng-model="cmsIntegration">
+                    <span class="switch {{cmsIntegration}}"></span>
+                </div>
+            </div>
+            <div ng-show="cmsIntegration == 'on'" layout="column">
+                <h3>Deployment Credentials</h3>
+                <small>CMS Integration requires a deployment be configured for your site. Please enter your deployment credentials so that we may connect to your CMS.</small>
+                <div flex layout="row" layout-align="center center">
+                    <span flex>Connection Type</span>
+                    <md-select ng-model="deployment.type">
+                        <md-option value="FTP">FTP</md-option>
+                        <md-option value="FTPS">FTPS</md-option>
+                        <md-option value="SFTP">SFTP</md-option>
+                    </md-select>
+                </div>
+                <div layout="row">
+                    <md-input-container flex="80">
+                        <label>Host</label>
+                        <input type="text" ng-model="deployment.host" />
+                    </md-input-container>
+                    <md-input-container flex="20">
+                        <label>Port</label>
+                        <input type="text" ng-model="deployment.port" />
+                    </md-input-container>
+                </div>
+                <md-input-container flex>
+                    <label>Username</label>
+                    <input type="text" ng-model="deployment.username" />
+                </md-input-container>
+                <md-input-container flex>
+                    <label>Password</label>
+                    <input type="password" ng-model="deployment.password" />
+                </md-input-container>
+                <md-input-container flex>
+                    <label>Path</label>
+                    <input type="text" ng-model="deployment.path" />
+                </md-input-container>
+                <h3>CMS Information</h3>
+                <small>Now that you've configured your deployment, please provide the CMS-specific information for this deployment.</small>
+                <div layout="row" layout-padding>
+                    <md-card class="application-card" ng-class="{'active': type.Id == application.type}" ng-click="selectApplicationType(type)" ng-repeat="type in applicationTypes" layout-padding layout-margin>
+                        <img ng-src="{{type.Logo_url}}" class="md-card-image" layout-margin layout-padding alt="{{type.Name}} Logo">
+                    </md-card>
+                </div>
+            </div>
+        </md-content>
+        <div class="md-actions" layout="row" layout-align="space-around center">
+            <span flex></span>
+            <md-button ng-click="add(site)" class="md-primary md-raised" aria-label="Add Site">
+                Add Site
+            </md-button>
+        </div>
+    </form>
+</md-content>

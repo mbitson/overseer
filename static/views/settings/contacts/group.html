@@ -1,0 +1,29 @@
+<md-content aria-label="Add A Group" flex layout="column" layout-align="center center">
+	<md-toolbar class="md-accent" flex>
+		<div class="md-toolbar-tools">
+			<h2>Create A Group</h2>
+		</div>
+	</md-toolbar>
+	<md-content flex layout="column">
+		<h3>New Group Settings</h3>
+		<small>Please enter a name for your new group of contacts.</small>
+		<md-input-container flex>
+			<label>Name</label>
+			<input name="group['Name']" ng-model="group.Name" />
+		</md-input-container>
+		<md-input-container flex>
+			<label>Contacts</label>
+			<select multiple
+					chosen
+					ng-model="group.Contacts"
+					ng-options="contact.Id as contact.Email for contact in contacts">
+			</select>
+		</md-input-container>
+	</md-content>
+	<div class="md-actions" layout="row" layout-align="space-around center">
+		<span flex></span>
+		<md-button ng-click="add(group)" class="md-primary md-raised" aria-label="Add Contact">
+			Save Group
+		</md-button>
+	</div>
+</md-content>

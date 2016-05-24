@@ -1,0 +1,23 @@
+<md-sidenav flex layout-fill class="md-sidenav-left md-sidenav-sites md-whiteframe-z4" md-theme="darcula" md-component-id="sites" >
+    <md-content ng-controller="siteNavigationCtrl">
+        <md-toolbar class="md-theme-light" layout="row">
+            <h1 class="md-toolbar-tools">Sites</h1>
+            <md-button class="md-accent md-button md-default-theme md-button-small" href="#/create" aria-label="Add A Site">
+                <ng-md-icon icon="add_circle" style="fill: #FFFFFF" size="25"></ng-md-icon>
+                <md-tooltip>Manage A New Site</md-tooltip>
+            </md-button>
+        </md-toolbar>
+        <md-list class="md-primary">
+            <md-list-item ng-repeat-start="site in sites" class="md-primary">
+                <span class="md-list-item-inner">
+                    <md-button ng-class="{'md-nav-active': false}" href="#/site/{{site.Id}}/dashboard" ng-click="toggleSites()">
+                        <div class="live-indicator live-indicator-mini" ng-class="{'live': site.Status == 1, 'down': site.Status == 0}"></div>
+                        {{site.Domain}}
+                        <md-tooltip>Manage {{site.Domain}}</md-tooltip>
+                    </md-button>
+                </span>
+            </md-list-item>
+            <md-divider ng-repeat-end></md-divider>
+        </md-list>
+    </md-content>
+</md-sidenav>
