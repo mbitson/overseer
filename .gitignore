@@ -79,3 +79,4 @@ _testmain.go
 # Mbitson Additions
 /conf/app.conf.txt
 *.pid
+/*.com
