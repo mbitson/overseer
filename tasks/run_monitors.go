@@ -1,22 +1,25 @@
 package tasks
 
 import (
-	"fmt"
-	"time"
-	"github.com/robfig/cron"
-	"go.mbitson.com/models"
-	"github.com/astaxie/beego/orm"
-	"github.com/parnurzeal/gorequest"
-	"net"
-	"github.com/davecgh/go-spew/spew"
-	"gopkg.in/gomail.v1"
 	"crypto/tls"
-	live "go.mbitson.com/controllers"
+	"fmt"
+	"github.com/astaxie/beego/orm"
+	"github.com/davecgh/go-spew/spew"
+	live "github.com/mbitson/overseer/controllers"
+	"github.com/mbitson/overseer/models"
+	"github.com/parnurzeal/gorequest"
+	"github.com/robfig/cron"
+	"gopkg.in/gomail.v1"
+	"net"
+	"time"
 )
 
 func init() {
 	c := cron.New()
-	c.AddFunc("@every 60s", run_monitors)
+	err := c.AddFunc("@every 60s", run_monitors)
+	if err != nil {
+		fmt.Println(err)
+	}
 	c.Start()
 }
 
@@ -28,10 +31,10 @@ func run_monitors() {
 	o := orm.NewOrm()
 	o.QueryTable("monitor").RelatedSel("site").All(&monitors)
 
-	fmt.Print("Getting runs... \r\n")
+	fmt.Print("Processing runs... \r\n")
 	runs := get_runs(monitors, runTime)
 
-	for _, thisRun := range runs{
+	for _, thisRun := range runs {
 		// Insert this run
 		o.Insert(thisRun)
 		o.Read(thisRun.Monitor)
@@ -47,12 +50,14 @@ func run_monitors() {
 
 		// Update site to reflect status code returned.
 		site := thisRun.Monitor.Site
-		if thisRun.Status_code == 200{
+		if thisRun.Status_code == 200 {
 			site.Status = 1
-		}else{
+		} else {
 			site.Status = 0
 		}
 		o.Update(site, "Status")
+
+		fmt.Print(site.Status)
 
 		// Check all alerts, trigger necessary notifications
 		check_alerts(thisRun)
@@ -61,7 +66,7 @@ func run_monitors() {
 	return
 }
 
-func get_runs(monitors []models.Monitor, runTime time.Time) ([]*models.MonitorRun){
+func get_runs(monitors []models.Monitor, runTime time.Time) []*models.MonitorRun {
 	runChannel := make(chan *models.MonitorRun, len(monitors)) // buffered, max length same as number of monitors
 
 	for _, monitor := range monitors {
@@ -72,7 +77,7 @@ func get_runs(monitors []models.Monitor, runTime time.Time) ([]*models.MonitorRu
 
 	for {
 		select {
-		case run := <- runChannel:
+		case run := <-runChannel:
 			runs = append(runs, run)
 			if len(runs) == len(monitors) {
 				return runs
@@ -83,29 +88,29 @@ func get_runs(monitors []models.Monitor, runTime time.Time) ([]*models.MonitorRu
 	return runs
 }
 
-func check_monitor(monitor models.Monitor, runTime time.Time, runChannel chan *models.MonitorRun){
+func check_monitor(monitor models.Monitor, runTime time.Time, runChannel chan *models.MonitorRun) {
 	// Firstly, check that this monitor needs to fire this round. See last fired date and interval and compare to now.
 	interval := float64(monitor.Interval)
 	timeSince := time.Since(monitor.Checked_date.Add(-4 * time.Hour)).Seconds()
-	if(interval < timeSince){
+	if interval < timeSince {
 		// Get URL from Domain
 		url := fmt.Sprint("http://", monitor.Site.Domain)
 
-		client := gorequest.New().Timeout(2*time.Millisecond)
+		client := gorequest.New().Timeout(2 * time.Millisecond)
 		pageStart := time.Now()
-		page, _, err := client.Get(url).Timeout(60*time.Second).End()
+		page, _, err := client.Get(url).Timeout(60 * time.Second).End()
 		var statusCode int
 		statusCode = 0
-		if err == nil{
+		if err == nil {
 			statusCode = page.StatusCode
-		}else{
+		} else {
 			statusCode = 500
 		}
-		pageElapsed := time.Since(pageStart).Nanoseconds()/1000000
+		pageElapsed := time.Since(pageStart).Nanoseconds() / 1000000
 
 		ipStart := time.Now()
 		net.LookupIP(monitor.Site.Domain)
-		ipElapsed := time.Since(ipStart).Nanoseconds()/1000000
+		ipElapsed := time.Since(ipStart).Nanoseconds() / 1000000
 
 		var monitorRun models.MonitorRun
 		monitorRun.Monitor = &monitor
@@ -129,7 +134,7 @@ func check_alerts(monitorRun *models.MonitorRun) {
 
 	for _, alert := range alerts {
 		alertFlag := false
-		if alert.Urgency > 1{
+		if alert.Urgency > 1 {
 			alertFlag = true
 			var monitorRuns []*models.MonitorRun
 			o.QueryTable("monitor_run").Filter("Monitor", monitorRun.Monitor).Limit(alert.Urgency).OrderBy("-time_run").All(&monitorRuns)
@@ -138,13 +143,13 @@ func check_alerts(monitorRun *models.MonitorRun) {
 					alertFlag = false
 				}
 			}
-		}else{ 
+		} else {
 			if monitorRun.Status_code != 200 {
 				alertFlag = true
 			}
 		}
 
-		if alertFlag == true{
+		if alertFlag == true {
 			// Email Alert
 			email_alert(alert, monitorRun)
 
@@ -153,7 +158,7 @@ func check_alerts(monitorRun *models.MonitorRun) {
 			// Update alert's last checked date
 			alert.Checked_date = time.Now()
 			o.Update(alert, "Checked_date")
-		}else{
+		} else {
 
 		}
 
@@ -162,7 +167,7 @@ func check_alerts(monitorRun *models.MonitorRun) {
 	return
 }
 
-func email_alert(alert *models.Alert, run *models.MonitorRun){
+func email_alert(alert *models.Alert, run *models.MonitorRun) {
 	msg := gomail.NewMessage()
 	msg.SetHeader("From", "me@mbitson.com")
 	msg.SetHeader("To", alert.Email)
@@ -181,7 +186,7 @@ func email_alert(alert *models.Alert, run *models.MonitorRun){
 	}
 }
 
-func get_monitor_alerts(monitor *models.Monitor) ([]*models.Alert){
+func get_monitor_alerts(monitor *models.Monitor) []*models.Alert {
 	// Load ORM
 	o := orm.NewOrm()
 	o.Using("default")
@@ -191,7 +196,7 @@ func get_monitor_alerts(monitor *models.Monitor) ([]*models.Alert){
 	return alerts
 }
 
-func get_site_alerts(site *models.Site) ([]*models.Alert){
+func get_site_alerts(site *models.Site) []*models.Alert {
 	// Load ORM
 	o := orm.NewOrm()
 	o.Using("default")

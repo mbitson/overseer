@@ -16,18 +16,6 @@ angular.module('overseerApp.siteCtrl', ["chart.js"]).
                 },
                 id: $stateParams.siteId
             };
-            $scope.dateOptions = {
-                timePicker: true,
-                format: 'M/DD/YY h:mm A',
-                timePickerIncrement: 10,
-                timePicker12Hour: true,
-                timePickerSeconds: false,
-                eventHandlers: {
-                    'apply.daterangepicker': function(ev, picker) {
-                        $scope.loadRuns();
-                    }
-                }
-            };
             $scope.loadRuns();
         };
 

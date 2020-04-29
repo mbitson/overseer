@@ -4,10 +4,6 @@ angular
         $scope.init = function(){
             $scope.site = {};
             $scope.applicationTypes = [];
-            $scope.cmsIntegration = "off";
-            $scope.deployment = {
-                type: "FTPS"
-            };
             $scope.application = {
                 type: 0
             };

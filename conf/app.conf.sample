@@ -1,0 +1,24 @@
+# Beego Configuration
+appname = localoverseer.mbitson.com
+httpaddr = "127.0.0.1"
+httpport = 2020
+runmode = prod
+copyrequestbody = true
+mysqluser = "homestead"
+mysqlpass = "secret"
+mysqlurls = ""
+mysqldb   = "overseer"
+
+# Overseer Configuration
+admin_first = "Mikel"
+admin_last = "Bitson"
+admin_email = "test@gmail.com"
+admin_init_pw = "123456"
+admin_sms = "2318675309"
+email_from = "test@gmail.com"
+email_from_name = "Overseer"
+email_smtp_host = "gmail.com"
+email_smtp_user = "test@gmail.com"
+email_smtp_password = "123456"
+email_smtp_port = 465
+monitored_sites = "mcg.mbitson.com;google.com"

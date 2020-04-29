@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"go.mbitson.com/models"
-	"github.com/astaxie/beego/orm"
 	"errors"
+	"github.com/astaxie/beego/orm"
+	"github.com/mbitson/overseer/models"
 	"time"
 )
 
@@ -27,58 +27,58 @@ func (this *AlertsApiController) URLMapping() {
 // @Failure 403 body is empty
 // @router / [post]
 func (this *AlertsApiController) Post() {
-//	// Load session data
-//	sess := this.GetSession("go.mbitson.com")
-//	if sess == nil {
-//		this.Redirect("/user/login/", 302)
-//		return
-//	}
-//
-//	// Map userdata to m
-//	m := sess.(map[string]interface{})
-//
-//	// Load orm
-//	o := orm.NewOrm()
-//	o.Using("default")
-//
-//	// Get the post data
-//	s_id := this.Ctx.Input.Params[":siteId"]
-//	siteId, _ := strconv.ParseInt(s_id, 0, 64)
-//	interval_str := this.Ctx.Input.Params[":interval"]
-//	interval, _ := strconv.ParseInt(interval_str, 0, 64)
-//	t_id := this.Ctx.Input.Params[":typeId"]
-//	typeId, _ := strconv.ParseInt(t_id, 0, 64)
-//	alertType := models.AlertType{Id: int(typeId)}
-//
-//	// Get this site from DB to confirm access for this user.
-//	var site *models.Site
-//	err := o.QueryTable("site").Filter("Id", siteId).Filter("User_id", m["id"]).One(&site)
-//	if err == orm.ErrNoRows {
-//		this.ajaxContent("You do not have access to create a alert for this site.")
-//		return
-//	}
-//
-//	// Attempt insert
-//	alert := models.Alert{Site: site, Interval: int(interval), Alert_type: &alertType}
-//	m_id, err := o.Insert(&alert)
-//	alert_id := int(m_id)
-//	if err != nil {
-//		this.ajaxContent("Error adding alert to system.")
-//		return
-//	}
-//
-//	// Log this creation
-//	this.logCustomActionAndId("Alert.Create", alert_id, m["id"].(int))
-//
-//	// If no error
-//	if err == nil {
-//		this.Data["json"] = alert_id
-//	}
-//	this.ServeJson()
+	//	// Load session data
+	//	sess := this.GetSession("os-auth")
+	//	if sess == nil {
+	//		this.Redirect("/user/login/", 302)
+	//		return
+	//	}
+	//
+	//	// Map userdata to m
+	//	m := sess.(map[string]interface{})
+	//
+	//	// Load orm
+	//	o := orm.NewOrm()
+	//	o.Using("default")
+	//
+	//	// Get the post data
+	//	s_id := this.Ctx.Input.Params[":siteId"]
+	//	siteId, _ := strconv.ParseInt(s_id, 0, 64)
+	//	interval_str := this.Ctx.Input.Params[":interval"]
+	//	interval, _ := strconv.ParseInt(interval_str, 0, 64)
+	//	t_id := this.Ctx.Input.Params[":typeId"]
+	//	typeId, _ := strconv.ParseInt(t_id, 0, 64)
+	//	alertType := models.AlertType{Id: int(typeId)}
+	//
+	//	// Get this site from DB to confirm access for this user.
+	//	var site *models.Site
+	//	err := o.QueryTable("site").Filter("Id", siteId).Filter("User_id", m["id"]).One(&site)
+	//	if err == orm.ErrNoRows {
+	//		this.ajaxContent("You do not have access to create a alert for this site.")
+	//		return
+	//	}
+	//
+	//	// Attempt insert
+	//	alert := models.Alert{Site: site, Interval: int(interval), Alert_type: &alertType}
+	//	m_id, err := o.Insert(&alert)
+	//	alert_id := int(m_id)
+	//	if err != nil {
+	//		this.ajaxContent("Error adding alert to system.")
+	//		return
+	//	}
+	//
+	//	// Log this creation
+	//	this.logCustomActionAndId("Alert.Create", alert_id, m["id"].(int))
+	//
+	//	// If no error
+	//	if err == nil {
+	//		this.Data["json"] = alert_id
+	//	}
+	//	this.ServeJSON()
 }
 
 func (this *AlertsApiController) Get() {
-	alertId := this.Ctx.Input.Params[":objectId"]
+	alertId := this.Ctx.Input.Param(":objectId")
 	if alertId != "" {
 		this.GetOne()
 	} else {
@@ -94,10 +94,10 @@ func (this *AlertsApiController) Get() {
 // @router /:id [get]
 func (this *AlertsApiController) GetOne() {
 	// Get Alert ID
-	siteId := this.Ctx.Input.Params[":objectId"]
+	siteId := this.Ctx.Input.Param(":objectId")
 
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -114,17 +114,17 @@ func (this *AlertsApiController) GetOne() {
 	_, err := o.QueryTable("alert").RelatedSel().Filter("Site__Id", siteId).Filter("Site__User__Id", m["id"]).All(&alerts)
 	if err == orm.ErrNoRows {
 		this.ajaxContent("Failure")
-	}else{
+	} else {
 		this.ajaxContent(&alerts)
 	}
 }
 
 func (this *AlertsApiController) GetRecent() {
 	// Get Alert ID
-	siteId := this.Ctx.Input.Params[":id"]
+	siteId := this.GetString("id")
 
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -139,15 +139,15 @@ func (this *AlertsApiController) GetRecent() {
 
 	var alerts []*models.Alert
 	_, err := o.
-				QueryTable("alert").
-				RelatedSel().
-				Filter("Site__Id", siteId).
-				Filter("Site__User", &models.AuthUser{Id: m["id"].(int)}).
-				Filter("Checked_date__gte", time.Now().Add(-24 * time.Hour)).
-				All(&alerts)
+		QueryTable("alert").
+		RelatedSel().
+		Filter("Site__Id", siteId).
+		Filter("Site__User", &models.AuthUser{Id: m["id"].(int)}).
+		Filter("Checked_date__gte", time.Now().Add(-24*time.Hour)).
+		All(&alerts)
 	if err == orm.ErrNoRows {
 		this.ajaxContent("Failure")
-	}else {
+	} else {
 		this.ajaxContent(&alerts)
 	}
 }
@@ -165,7 +165,7 @@ func (this *AlertsApiController) GetRecent() {
 // @router / [get]
 func (this *AlertsApiController) GetAll() {
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -191,7 +191,7 @@ func (this *AlertsApiController) GetAll() {
 // @Failure 403 :id is not int
 // @router /:id [put]
 func (this *AlertsApiController) Put() {
-	
+
 }
 
 // @Title Delete
@@ -202,7 +202,7 @@ func (this *AlertsApiController) Put() {
 // @router /:id [delete]
 func (this *AlertsApiController) Delete() {
 	// Get Alert ID
-	alertId := this.Ctx.Input.Params[":objectId"]
+	alertId := this.Ctx.Input.Param(":objectId")
 
 	// Load ORM
 	o := orm.NewOrm()
@@ -225,7 +225,7 @@ func (this *AlertsApiController) Delete() {
 
 	// Delete alert
 	_, delete_err := o.QueryTable("alert").Filter("Id", alertId).Delete()
-	if delete_err != nil{
+	if delete_err != nil {
 		this.ajaxContent("Could Not Delete Alert!")
 		return
 	}
@@ -234,10 +234,10 @@ func (this *AlertsApiController) Delete() {
 	this.ajaxContent("Success")
 }
 
-func (this *AlertsApiController) canAccessSite(site_id int) (bool) {
+func (this *AlertsApiController) canAccessSite(site_id int) bool {
 	// Map userdata to m
 	m, err := this.getUserData()
-	if err != nil{
+	if err != nil {
 		return false
 	}
 
@@ -257,7 +257,7 @@ func (this *AlertsApiController) canAccessSite(site_id int) (bool) {
 
 func (this *AlertsApiController) getUserData() (map[string]interface{}, error) {
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return nil, errors.New("Not Logged In")
