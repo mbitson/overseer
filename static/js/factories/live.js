@@ -2,7 +2,7 @@
 var ws;
 angular.module( 'overseerApp.liveFactory', [])
 	.run( function ( $websocket, $rootScope ) {
-		ws = $websocket( 'ws://go.mbitson.com/api/live/join' );
+		ws = $websocket( 'ws://' + window.location.hostname + '/api/live/join' );
 
 		ws.onMessage( function ( message ) {
 			event = JSON.parse( message.data ) ;

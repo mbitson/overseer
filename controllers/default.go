@@ -2,53 +2,16 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
-	"go.mbitson.com/models"
 	"github.com/astaxie/beego/orm"
+	"github.com/mbitson/overseer/models"
 	"strings"
-	"bitbucket.org/tebeka/selenium"
-	"fmt"
-	"time"
 )
 
 type MainController struct {
 	beego.Controller
 }
 
-func (this *MainController) Test(){
-	fmt.Println("Requesting capabilities and creating session...")
-	caps := selenium.Capabilities{
-		"browserName": "firefox",
-		"javascriptEnabled": true,
-		"takesScreenshot": true,
-	}
-	wd, err := selenium.NewRemote(caps, "")
-	if err != nil{
-		fmt.Println(err)
-	}
-	defer wd.Quit()
-
-	fmt.Println("Connecting to URL with session...")
-	// Get simple playground interface
-	wd.Get("http://www.grandvillages.com")
-
-
-	fmt.Println("Getting Body element...")
-	// Get the result
-	output := ""
-	for {
-		output, _ = wd.PageSource()
-		if output != "Waiting for remote server..." {
-			break
-		}
-		time.Sleep(time.Millisecond * 100)
-	}
-
-	fmt.Println("Setting return JSON...")
-	this.Data["json"] = &output
-
-	fmt.Println("Serve JSON.")
-
-	this.ServeJson()
+func (this *MainController) Test() {
 }
 
 func (this *MainController) activeContent(view string, layout string) {
@@ -58,14 +21,15 @@ func (this *MainController) activeContent(view string, layout string) {
 
 	this.LayoutSections = make(map[string]string)
 
+	this.LayoutSections["Head"] = "common/head.tpl"
 	this.LayoutSections["Header"] = "common/header.tpl"
 	this.LayoutSections["Sidebar"] = "common/sidebar.tpl"
 	this.LayoutSections["Footer"] = "common/footer.tpl"
 
 	this.Layout = layout + ".tpl"
-	this.TplNames = view + ".tpl"
+	this.TplName = view + ".tpl"
 
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess != nil {
 		this.Data["InSession"] = 1 // for login bar in header.tpl
 		m := sess.(map[string]interface{})
@@ -77,13 +41,14 @@ func (this *MainController) bareContent(view string, layout string) {
 
 	this.LayoutSections = make(map[string]string)
 
+	this.LayoutSections["Head"] = "common/head.tpl"
 	this.LayoutSections["Header"] = "common/bare-header.tpl"
 	this.LayoutSections["Footer"] = "common/bare-footer.tpl"
 
 	this.Layout = "layout-bare.tpl"
-	this.TplNames = view + ".tpl"
+	this.TplName = view + ".tpl"
 
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess != nil {
 		this.Data["InSession"] = 1 // for login bar in header.tpl
 		m := sess.(map[string]interface{})
@@ -93,14 +58,14 @@ func (this *MainController) bareContent(view string, layout string) {
 
 func (this *MainController) ajaxContent(content interface{}) {
 	this.Data["json"] = &content
-	this.ServeJson()
+	this.ServeJSON()
 }
 
 func (this *MainController) Get() {
 	this.activeContent("index", "")
 
 	//******** This page requires login
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return

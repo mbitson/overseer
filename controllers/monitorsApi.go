@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"go.mbitson.com/models"
-	"github.com/astaxie/beego/orm"
-	"strconv"
 	"errors"
+	"github.com/astaxie/beego/orm"
+	"github.com/mbitson/overseer/models"
+	"strconv"
 )
 
 // operations for Monitors.Go
@@ -28,7 +28,7 @@ func (this *MonitorsApiController) URLMapping() {
 // @router / [post]
 func (this *MonitorsApiController) Post() {
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -42,11 +42,11 @@ func (this *MonitorsApiController) Post() {
 	o.Using("default")
 
 	// Get the post data
-	s_id := this.Ctx.Input.Params[":siteId"]
+	s_id := this.GetString("siteId")
 	siteId, _ := strconv.ParseInt(s_id, 0, 64)
-	interval_str := this.Ctx.Input.Params[":interval"]
+	interval_str := this.GetString("interval")
 	interval, _ := strconv.ParseInt(interval_str, 0, 64)
-	t_id := this.Ctx.Input.Params[":typeId"]
+	t_id := this.GetString("typeId")
 	typeId, _ := strconv.ParseInt(t_id, 0, 64)
 	monitorType := models.MonitorType{Id: int(typeId)}
 
@@ -74,11 +74,11 @@ func (this *MonitorsApiController) Post() {
 	if err == nil {
 		this.Data["json"] = monitor_id
 	}
-	this.ServeJson()
+	this.ServeJSON()
 }
 
 func (this *MonitorsApiController) Get() {
-	monitorId := this.Ctx.Input.Params[":objectId"]
+	monitorId := this.Ctx.Input.Param(":objectId")
 	if monitorId != "" {
 		this.GetOne()
 	} else {
@@ -94,10 +94,10 @@ func (this *MonitorsApiController) Get() {
 // @router /:id [get]
 func (this *MonitorsApiController) GetOne() {
 	// Get Monitor ID
-	siteId := this.Ctx.Input.Params[":objectId"]
+	siteId := this.Ctx.Input.Param(":objectId")
 
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -114,7 +114,7 @@ func (this *MonitorsApiController) GetOne() {
 	_, err := o.QueryTable("monitor").RelatedSel().Filter("Site__Id", siteId).Filter("Site__User__Id", m["id"]).All(&monitors)
 	if err == orm.ErrNoRows {
 		this.ajaxContent("Failure")
-	}else{
+	} else {
 		this.ajaxContent(&monitors)
 	}
 }
@@ -132,7 +132,7 @@ func (this *MonitorsApiController) GetOne() {
 // @router / [get]
 func (this *MonitorsApiController) GetAll() {
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -158,7 +158,7 @@ func (this *MonitorsApiController) GetAll() {
 // @Failure 403 :id is not int
 // @router /:id [put]
 func (this *MonitorsApiController) Put() {
-	
+
 }
 
 // @Title Delete
@@ -169,7 +169,7 @@ func (this *MonitorsApiController) Put() {
 // @router /:id [delete]
 func (this *MonitorsApiController) Delete() {
 	// Get Monitor ID
-	monitorId := this.Ctx.Input.Params[":objectId"]
+	monitorId := this.Ctx.Input.Param(":objectId")
 
 	// Load ORM
 	o := orm.NewOrm()
@@ -192,7 +192,7 @@ func (this *MonitorsApiController) Delete() {
 
 	// Delete monitor
 	_, delete_err := o.QueryTable("monitor").Filter("Id", monitorId).Delete()
-	if delete_err != nil{
+	if delete_err != nil {
 		this.ajaxContent("Could Not Delete Monitor!")
 		return
 	}
@@ -201,10 +201,10 @@ func (this *MonitorsApiController) Delete() {
 	this.ajaxContent("Success")
 }
 
-func (this *MonitorsApiController) canAccessSite(site_id int) (bool) {
+func (this *MonitorsApiController) canAccessSite(site_id int) bool {
 	// Map userdata to m
 	m, err := this.getUserData()
-	if err != nil{
+	if err != nil {
 		return false
 	}
 
@@ -224,7 +224,7 @@ func (this *MonitorsApiController) canAccessSite(site_id int) (bool) {
 
 func (this *MonitorsApiController) getUserData() (map[string]interface{}, error) {
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return nil, errors.New("Not Logged In")

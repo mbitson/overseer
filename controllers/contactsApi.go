@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"go.mbitson.com/models"
 	"github.com/astaxie/beego/orm"
+	"github.com/mbitson/overseer/models"
 )
 
 // operations for Sites.Go
@@ -27,7 +27,7 @@ func (this *ContactsApiController) URLMapping() {
 func (this *ContactsApiController) Post() {
 
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -47,21 +47,21 @@ func (this *ContactsApiController) Post() {
 	o.Using("default")
 
 	// Insert contact!
-	contact := models.Contact{User: &models.AuthUser{Id:m["id"].(int)}, First: first, Last: last, Email:email, Sms:sms}
+	contact := models.Contact{User: &models.AuthUser{Id: m["id"].(int)}, First: first, Last: last, Email: email, Sms: sms}
 	contact_id, contactInsertError := o.Insert(&contact)
 	this.logCustomActionAndId("Contact.Create", int(contact_id), m["id"].(int))
 
 	// If no error
 	if contactInsertError == nil {
 		this.Data["json"] = contact
-	}else{
+	} else {
 		this.Data["json"] = "Error inserting contact."
 	}
-	this.ServeJson()
+	this.ServeJSON()
 }
 
 func (this *ContactsApiController) Get() {
-	contactId := this.Ctx.Input.Params[":objectId"]
+	contactId := this.Ctx.Input.Param(":objectId")
 	if contactId != "" {
 		this.GetOne()
 	} else {
@@ -77,10 +77,10 @@ func (this *ContactsApiController) Get() {
 // @router /:id [get]
 func (this *ContactsApiController) GetOne() {
 	// Get Contact ID
-	contactId := this.Ctx.Input.Params[":objectId"]
+	contactId := this.Ctx.Input.Param(":objectId")
 
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -94,10 +94,10 @@ func (this *ContactsApiController) GetOne() {
 	o.Using("default")
 
 	var contacts models.Contact
-	err := o.QueryTable("contact").Filter("Id", contactId).Filter("User", &models.AuthUser{Id:m["id"].(int)}).One(&contacts)
+	err := o.QueryTable("contact").Filter("Id", contactId).Filter("User", &models.AuthUser{Id: m["id"].(int)}).One(&contacts)
 	if err == orm.ErrNoRows {
 		this.ajaxContent("Failure")
-	}else{
+	} else {
 		this.ajaxContent(&contacts)
 	}
 }
@@ -115,7 +115,7 @@ func (this *ContactsApiController) GetOne() {
 // @router / [get]
 func (this *ContactsApiController) GetAll() {
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -129,7 +129,7 @@ func (this *ContactsApiController) GetAll() {
 	o.Using("default")
 
 	var contacts []orm.Params
-	o.QueryTable("contact").Filter("User", &models.AuthUser{Id:m["id"].(int)}).Values(&contacts)
+	o.QueryTable("contact").Filter("User", &models.AuthUser{Id: m["id"].(int)}).Values(&contacts)
 	this.ajaxContent(&contacts)
 }
 
@@ -141,7 +141,7 @@ func (this *ContactsApiController) GetAll() {
 // @Failure 403 :id is not int
 // @router /:id [put]
 func (this *ContactsApiController) Put() {
-	
+
 }
 
 // @Title Delete
@@ -152,10 +152,10 @@ func (this *ContactsApiController) Put() {
 // @router /:id [delete]
 func (this *ContactsApiController) Delete() {
 	// Get Contact ID
-	contactId := this.Ctx.Input.Params[":objectId"]
+	contactId := this.Ctx.Input.Param(":objectId")
 
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -168,6 +168,6 @@ func (this *ContactsApiController) Delete() {
 	o := orm.NewOrm()
 	o.Using("default")
 
-	o.QueryTable("contact").Filter("User", &models.AuthUser{Id:m["id"].(int)}).Filter("Id", contactId).Delete()
+	o.QueryTable("contact").Filter("User", &models.AuthUser{Id: m["id"].(int)}).Filter("Id", contactId).Delete()
 	this.ajaxContent("Success")
 }

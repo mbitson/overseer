@@ -12,53 +12,12 @@
                 <label>Domain To Manage</label>
                 <input name="site['Domain']" ng-model="site.Domain" />
             </md-input-container>
-            <div flex layout="row" layout-align="space-around center">
-                <span flex style="color: #7f7f7f;">Enable CMS Integration</span>
-                <span flex></span>
-                <div class="toggle-bg {{cmsIntegration}}">
-                    <input type="radio" name="toggle" value="off" ng-model="cmsIntegration">
-                    <input type="radio" name="toggle" value="on" ng-model="cmsIntegration">
-                    <span class="switch {{cmsIntegration}}"></span>
-                </div>
-            </div>
-            <div ng-show="cmsIntegration == 'on'" layout="column">
-                <h3>Deployment Credentials</h3>
-                <small>CMS Integration requires a deployment be configured for your site. Please enter your deployment credentials so that we may connect to your CMS.</small>
-                <div flex layout="row" layout-align="center center">
-                    <span flex>Connection Type</span>
-                    <md-select ng-model="deployment.type">
-                        <md-option value="FTP">FTP</md-option>
-                        <md-option value="FTPS">FTPS</md-option>
-                        <md-option value="SFTP">SFTP</md-option>
-                    </md-select>
-                </div>
-                <div layout="row">
-                    <md-input-container flex="80">
-                        <label>Host</label>
-                        <input type="text" ng-model="deployment.host" />
-                    </md-input-container>
-                    <md-input-container flex="20">
-                        <label>Port</label>
-                        <input type="text" ng-model="deployment.port" />
-                    </md-input-container>
-                </div>
-                <md-input-container flex>
-                    <label>Username</label>
-                    <input type="text" ng-model="deployment.username" />
-                </md-input-container>
-                <md-input-container flex>
-                    <label>Password</label>
-                    <input type="password" ng-model="deployment.password" />
-                </md-input-container>
-                <md-input-container flex>
-                    <label>Path</label>
-                    <input type="text" ng-model="deployment.path" />
-                </md-input-container>
-                <h3>CMS Information</h3>
-                <small>Now that you've configured your deployment, please provide the CMS-specific information for this deployment.</small>
+            <div layout="column">
+                <h3>Primary Application</h3>
+                <small>Please chose the primary application we should monitor on this domain.</small>
                 <div layout="row" layout-padding>
                     <md-card class="application-card" ng-class="{'active': type.Id == application.type}" ng-click="selectApplicationType(type)" ng-repeat="type in applicationTypes" layout-padding layout-margin>
-                        <img ng-src="{{type.Logo_url}}" class="md-card-image" layout-margin layout-padding alt="{{type.Name}} Logo">
+                        {{type.Name}}
                     </md-card>
                 </div>
             </div>

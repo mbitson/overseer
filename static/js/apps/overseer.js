@@ -41,10 +41,7 @@ overseer.config( function ( $stateProvider, $urlRouterProvider, $mdThemingProvid
 			resolve:     {
 				loadDatePicker: function ( $ocLazyLoad ) {
 					return $ocLazyLoad.load( [
-						{ files: [ '/static/bower_components/bootstrap/dist/css/bootstrap.css' ] },
-						{ files: [ '/static/bower_components/bootstrap-daterangepicker/daterangepicker-bs3.css' ] },
-						{ files: [ '/static/bower_components/bootstrap-daterangepicker/daterangepicker.js' ] },
-						{ files: [ '/static/bower_components/angular-daterangepicker/js/angular-daterangepicker.min.js' ] }
+						{ files: [ '/static/node_modules/bootstrap/dist/css/bootstrap.min.css' ] }
 					] )
 				}
 			}
@@ -74,14 +71,6 @@ overseer.config( function ( $stateProvider, $urlRouterProvider, $mdThemingProvid
 					] );
 				}
 			}
-		} ).
-		state( 'site.cms', {
-			url:         '/cms',
-			templateUrl: '/static/views/sites/pages/cms.tmpl.html'
-		} ).
-		state( 'site.seo', {
-			url:         '/seo',
-			templateUrl: '/static/views/sites/pages/seo.tmpl.html'
 		} ).
 		state( 'create', {
 			url:         '/create',
@@ -165,11 +154,11 @@ overseer.config( function ( $stateProvider, $urlRouterProvider, $mdThemingProvid
 								'/static/js/controllers/settingsContacts.js',
 								'/static/js/factories/contacts.js',
 								'/static/js/factories/groups.js',
-								'static/bower_components/chosen/chosen.css',
-								'static/bower_components/chosen/chosen.jquery.js',
-								'static/bower_components/angular-chosen-localytics/chosen.js',
-								'static/bower_components/toastr/toastr.min.css',
-								'static/bower_components/toastr/toastr.js'
+								'/static/node_modules/chosenjs/chosen.min.css',
+								'/static/node_modules/chosenjs/chosen.jquery.min.js',
+								'/static/node_modules/angular-chosen-localytics/dist/angular-chosen.min.js',
+								'/static/node_modules/toastr/build/toastr.min.css',
+								'/static/node_modules/toastr/build/toastr.min.js'
 							]
 						}
 					] );
@@ -196,25 +185,13 @@ overseer.config( function ( $stateProvider, $urlRouterProvider, $mdThemingProvid
 				loadSettings: function ( $ocLazyLoad ) {
 					return $ocLazyLoad.load( [
 						{ files: [
-							'static/bower_components/chosen/chosen.css',
-							'static/bower_components/chosen/chosen.jquery.js',
-							'static/bower_components/angular-chosen-localytics/chosen.js',
+							'/static/node_modules/chosenjs/chosen.min.css',
+							'/static/node_modules/chosenjs/chosen.jquery.min.js',
+							'/static/node_modules/angular-chosen-localytics/dist/angular-chosen.min.js',
 							'/static/js/controllers/settingsContactsGroupCreate.js',
 							'/static/js/factories/groups.js',
 							'/static/js/factories/contacts.js'
 						] }
-					] );
-				}
-			}
-		} ).
-		state( 'settings.billing', {
-			url:         '/billing',
-			templateUrl: '/static/views/settings/billing.html',
-			controller:  'settingsBillingCtrl',
-			resolve:     {
-				loadSettings: function ( $ocLazyLoad ) {
-					return $ocLazyLoad.load( [
-						{ files: [ '/static/js/controllers/settingsBilling.js' ] }
 					] );
 				}
 			}

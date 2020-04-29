@@ -1,0 +1,44 @@
+{
+  "name": "overseer",
+  "version": "0.0.2",
+  "description": "A site monitoring application written in Go with a frontend built on AngularJS.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mbitson/overseer.git"
+  },
+  "keywords": [
+    "go",
+    "angularjs",
+    "monitoring",
+    "alerts"
+  ],
+  "author": "mbitson",
+  "license": "SEE LICENSE IN COPYING",
+  "bugs": {
+    "url": "https://github.com/mbitson/overseer/issues"
+  },
+  "homepage": "https://github.com/mbitson/overseer#readme",
+  "dependencies": {
+    "angular": "1.4.0",
+    "angular-animate": "^1.4.0",
+    "angular-aria": "^1.4.0",
+    "angular-chart.js": "^0.7.2",
+    "angular-chosen-localytics": "^1.9.3",
+    "angular-material": "^0.9.7",
+    "angular-material-icons": "^0.4.0",
+    "angular-route": "^1.4.0",
+    "angular-ui-router": "^0.2.15",
+    "angular-websocket": "^1.0.13",
+    "animate.css": "^3.7.2",
+    "bootstrap": "^3.3.5",
+    "chart.js": "^1.0.1",
+    "chosenjs": "^1.4.3",
+    "moment": "^2.9.0",
+    "oclazyload": "^1.0.1",
+    "toastr": "^2.1.4"
+  }
+}

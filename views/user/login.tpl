@@ -3,10 +3,10 @@
         <span flex></span>
         <form flex name="userForm" method="post" action="">
             <p class="clean-text text-faint" style="font-size: 32px;">
-                - BETA ONLY -
+                - CLOSED BETA -
             </p>
             <p class="clean-text">
-                Please login to manage your assets.
+                Please login to monitor your assets.
             </p>
             <<<if .flash.error>>>
                 <div class="alert alert-danger">

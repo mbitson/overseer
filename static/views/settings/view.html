@@ -1,5 +1,5 @@
-<md-content aria-label="Account Settings" flex layout-margin layout-padding layout="row" layout-align="center center">
-	<form class="create-form" flex layout-margin layout-padding>
+<md-content aria-label="Account Settings" flex layout="row" layout-align="center center">
+	<form class="create-form" flex>
 		<md-toolbar class="md-accent">
 			<div class="md-toolbar-tools" >
 				<h2>Account Settings</h2>
@@ -15,9 +15,6 @@
 							</md-button>
 							<md-button href="/#/settings/contacts/list" ng-class="{'md-nav-active': $state.includes('settings.contacts')}" ng-disabled="$state.is('settings.contacts')">
 								Contacts
-							</md-button>
-							<md-button href="/#/settings/billing" ng-class="{'md-nav-active': $state.includes('settings.billing')}" ng-disabled="$state.is('settings.billing')">
-								Billing
 							</md-button>
 						</div>
 					</md-toolbar>

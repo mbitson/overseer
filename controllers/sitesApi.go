@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"go.mbitson.com/models"
 	"github.com/astaxie/beego/orm"
+	"github.com/mbitson/overseer/models"
 )
 
 // operations for Sites.Go
@@ -27,7 +27,7 @@ func (this *SitesApiController) URLMapping() {
 func (this *SitesApiController) Post() {
 
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -45,7 +45,7 @@ func (this *SitesApiController) Post() {
 	o.Begin()
 
 	// Attempt insert
-	site := models.Site{Domain: domain, User: &models.AuthUser{Id:m["id"].(int)}}
+	site := models.Site{Domain: domain, User: &models.AuthUser{Id: m["id"].(int)}}
 	id, siteInsertError := o.Insert(&site)
 	this.logCustomActionAndId("Site.Create", int(id), m["id"].(int))
 
@@ -56,7 +56,7 @@ func (this *SitesApiController) Post() {
 	this.logCustomActionAndId("Monitor.Create", int(m_id), m["id"].(int))
 
 	// Add default alert and log.
-	alert := models.Alert{Name: "Default Alert", Site: &site, Email:"me@mbitson.com", Sms:"2313296944", Urgency:2}
+	alert := models.Alert{Name: "Default Alert", Site: &site, Email: "me@mbitson.com", Sms: "2313296944", Urgency: 2}
 	a_id, alertInsertError := o.Insert(&alert)
 	this.logCustomActionAndId("Alert.Create", int(a_id), m["id"].(int))
 
@@ -66,15 +66,15 @@ func (this *SitesApiController) Post() {
 		o.Commit()
 		// Override failure response with success message!
 		this.Data["json"] = site
-	}else{
+	} else {
 		o.Rollback()
 		this.Data["json"] = "Error adding your site. Please contact support."
 	}
-	this.ServeJson()
+	this.ServeJSON()
 }
 
 func (this *SitesApiController) Get() {
-	siteId := this.Ctx.Input.Params[":objectId"]
+	siteId := this.Ctx.Input.Param(":objectId")
 	if siteId != "" {
 		this.GetOne()
 	} else {
@@ -90,10 +90,10 @@ func (this *SitesApiController) Get() {
 // @router /:id [get]
 func (this *SitesApiController) GetOne() {
 	// Get Site ID
-	siteId := this.Ctx.Input.Params[":objectId"]
+	siteId := this.Ctx.Input.Param(":objectId")
 
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -107,10 +107,10 @@ func (this *SitesApiController) GetOne() {
 	o.Using("default")
 
 	var sites models.Site
-	err := o.QueryTable("site").Filter("Id", siteId).Filter("User", &models.AuthUser{Id:m["id"].(int)}).One(&sites)
+	err := o.QueryTable("site").Filter("Id", siteId).Filter("User", &models.AuthUser{Id: m["id"].(int)}).One(&sites)
 	if err == orm.ErrNoRows {
 		this.ajaxContent("Failure")
-	}else{
+	} else {
 		this.ajaxContent(&sites)
 	}
 }
@@ -128,7 +128,7 @@ func (this *SitesApiController) GetOne() {
 // @router / [get]
 func (this *SitesApiController) GetAll() {
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -142,7 +142,7 @@ func (this *SitesApiController) GetAll() {
 	o.Using("default")
 
 	var sites []orm.Params
-	o.QueryTable("site").Filter("User", &models.AuthUser{Id:m["id"].(int)}).Values(&sites)
+	o.QueryTable("site").Filter("User", &models.AuthUser{Id: m["id"].(int)}).Values(&sites)
 	//o.Raw("SELECT site.id, site.domain, site.reg_date, site.user_id FROM site AS site JOIN monitor AS monitor ON site.id == monitor.id JOIN monitor_run AS run ON run.monitor_id == monitor.id WHERE site.user_id = ?", m["id"]).Values(&sites)
 	this.ajaxContent(&sites)
 }
@@ -155,7 +155,7 @@ func (this *SitesApiController) GetAll() {
 // @Failure 403 :id is not int
 // @router /:id [put]
 func (this *SitesApiController) Put() {
-	
+
 }
 
 // @Title Delete
@@ -166,10 +166,10 @@ func (this *SitesApiController) Put() {
 // @router /:id [delete]
 func (this *SitesApiController) Delete() {
 	// Get Site ID
-	siteId := this.Ctx.Input.Params[":objectId"]
+	siteId := this.Ctx.Input.Param(":objectId")
 
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -182,6 +182,6 @@ func (this *SitesApiController) Delete() {
 	o := orm.NewOrm()
 	o.Using("default")
 
-	o.QueryTable("site").Filter("User", &models.AuthUser{Id:m["id"].(int)}).Filter("Id", siteId).Delete()
+	o.QueryTable("site").Filter("User", &models.AuthUser{Id: m["id"].(int)}).Filter("Id", siteId).Delete()
 	this.ajaxContent("Success")
 }

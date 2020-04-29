@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"go.mbitson.com/models"
-	"github.com/astaxie/beego/orm"
 	"errors"
+	"github.com/astaxie/beego/orm"
+	"github.com/mbitson/overseer/models"
 )
 
 // operations for Monitors.Go
@@ -30,7 +30,7 @@ func (this *MonitorRunsApiController) Post() {
 }
 
 func (this *MonitorRunsApiController) Get() {
-	siteId := this.Ctx.Input.Params[":objectId"]
+	siteId := this.Ctx.Input.Param(":objectId")
 	if siteId != "" {
 		this.GetOne()
 	}
@@ -44,12 +44,12 @@ func (this *MonitorRunsApiController) Get() {
 // @router /:id [get]
 func (this *MonitorRunsApiController) GetOne() {
 	// Get Monitor ID
-	siteId := this.Ctx.Input.Params[":id"]
-	start := this.Ctx.Input.Params[":start"]
-	end := this.Ctx.Input.Params[":end"]
+	siteId := this.Ctx.Input.Param(":id")
+	start := this.Ctx.Input.Param(":start")
+	end := this.Ctx.Input.Param(":end")
 
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -87,7 +87,7 @@ func (this *MonitorRunsApiController) GetOne() {
 // @router / [get]
 func (this *MonitorRunsApiController) GetAll() {
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -113,7 +113,7 @@ func (this *MonitorRunsApiController) GetAll() {
 // @Failure 403 :id is not int
 // @router /:id [put]
 func (this *MonitorRunsApiController) Put() {
-	
+
 }
 
 // @Title Delete
@@ -124,7 +124,7 @@ func (this *MonitorRunsApiController) Put() {
 // @router /:id [delete]
 func (this *MonitorRunsApiController) Delete() {
 	// Get Monitor ID
-	monitorId := this.Ctx.Input.Params[":objectId"]
+	monitorId := this.Ctx.Input.Param(":objectId")
 
 	// Load ORM
 	o := orm.NewOrm()
@@ -147,7 +147,7 @@ func (this *MonitorRunsApiController) Delete() {
 
 	// Delete monitor
 	_, delete_err := o.QueryTable("monitor").Filter("Id", monitorId).Delete()
-	if delete_err != nil{
+	if delete_err != nil {
 		this.ajaxContent("Could Not Delete Monitor!")
 		return
 	}
@@ -156,8 +156,7 @@ func (this *MonitorRunsApiController) Delete() {
 	this.ajaxContent("Success")
 }
 
-
-func (this *MonitorRunsApiController) canAccessSite(site_id int) (bool) {
+func (this *MonitorRunsApiController) canAccessSite(site_id int) bool {
 	// Map userdata to m
 	m, err := this.getUserData()
 	if err != nil {
@@ -180,7 +179,7 @@ func (this *MonitorRunsApiController) canAccessSite(site_id int) (bool) {
 
 func (this *MonitorRunsApiController) getUserData() (map[string]interface{}, error) {
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return nil, errors.New("Not Logged In")
