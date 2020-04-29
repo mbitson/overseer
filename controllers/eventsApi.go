@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"go.mbitson.com/models"
 	"github.com/astaxie/beego/orm"
+	"github.com/mbitson/overseer/models"
 )
 
 // operations for Sites.Go
@@ -51,7 +51,7 @@ func (this *EventsApiController) GetOne() {
 // @router / [get]
 func (this *EventsApiController) GetAll() {
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/home", 302)
 		return
@@ -71,7 +71,7 @@ func (this *EventsApiController) GetAll() {
 
 func (this *EventsApiController) AddNew() bool {
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/home", 302)
 		return false
@@ -84,7 +84,7 @@ func (this *EventsApiController) AddNew() bool {
 	o := orm.NewOrm()
 	o.Using("default")
 
-	site := models.Site{Domain: "go.mbitson.com", User: &models.AuthUser{Id:m["id"].(int)}}
+	site := models.Site{Domain: "overseer.mbitson.com", User: &models.AuthUser{Id: m["id"].(int)}}
 
 	_, err := o.Insert(&site)
 	if err != nil {
@@ -102,7 +102,7 @@ func (this *EventsApiController) AddNew() bool {
 // @Failure 403 :id is not int
 // @router /:id [put]
 func (this *EventsApiController) Put() {
-	
+
 }
 
 // @Title Delete
@@ -112,5 +112,5 @@ func (this *EventsApiController) Put() {
 // @Failure 403 id is empty
 // @router /:id [delete]
 func (this *EventsApiController) Delete() {
-	
+
 }

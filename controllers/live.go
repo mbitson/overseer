@@ -2,14 +2,14 @@ package controllers
 
 import (
 	"container/list"
-	"github.com/gorilla/websocket"
-	"time"
 	"encoding/json"
-	"net/http"
+	"fmt"
 	"github.com/astaxie/beego"
 	_ "github.com/davecgh/go-spew/spew"
-	"fmt"
+	"github.com/gorilla/websocket"
+	"net/http"
 	"strings"
+	"time"
 )
 
 type LiveController struct {
@@ -22,22 +22,22 @@ type LiveController struct {
 type EventData interface{}
 type Event struct {
 	event string
-	Name 		string
-	Email 		string
-	Fired 		int
-	Data 		[]EventData
+	Name  string
+	Email string
+	Fired int
+	Data  []EventData
 }
 
 /**
  * Register subscription and subscriber types
  */
 type Subscriber struct {
-	Email 		string
-	Conn  		*websocket.Conn
+	Email string
+	Conn  *websocket.Conn
 }
 type Subscription struct {
-	Archive 	[]Event      // All the events from the archive.
-	New     	<-chan Event // New events coming in.
+	Archive []Event      // All the events from the archive.
+	New     <-chan Event // New events coming in.
 }
 
 const (
@@ -51,12 +51,12 @@ const (
  * Create necessary global WS channels
  */
 var (
-	subscribe = make(chan Subscriber, 10)
+	subscribe   = make(chan Subscriber, 10)
 	unsubscribe = make(chan string, 10)
-	publish = make(chan Event, 10)
+	publish     = make(chan Event, 10)
 	waitingList = list.New()
 	subscribers = list.New()
-	archive = list.New()
+	archive     = list.New()
 )
 
 /**
@@ -107,15 +107,15 @@ func isUserExist(subscribers *list.List, user string) bool {
  * incoming and outgoing requests from
  * our web sockets.
  */
-func liveSockets(){
+func liveSockets() {
 	for {
 		select {
 		case sub := <-subscribe:
 			if !isUserExist(subscribers, sub.Email) {
 				subscribers.PushBack(sub)
-//				NewEvent := NewEvent("CLIENT.JOIN", sub.Email, []EventData{})
-//				spew.Dump(NewEvent)
-//				publish <- NewEvent
+				//				NewEvent := NewEvent("CLIENT.JOIN", sub.Email, []EventData{})
+				//				spew.Dump(NewEvent)
+				//				publish <- NewEvent
 			}
 		case event := <-publish:
 			for ch := waitingList.Back(); ch != nil; ch = ch.Prev() {
@@ -148,7 +148,7 @@ func BroadcastEvent(event Event) {
 	for sub := subscribers.Front(); sub != nil; sub = sub.Next() {
 		subEmail := strings.Trim(strings.ToLower(sub.Value.(Subscriber).Email), " ")
 		eventEmail := strings.Trim(strings.ToLower(event.Email), " ")
-		if subEmail == eventEmail{
+		if subEmail == eventEmail {
 			ws := sub.Value.(Subscriber).Conn
 			if ws != nil {
 				if ws.WriteMessage(websocket.TextMessage, data) != nil {
@@ -159,20 +159,19 @@ func BroadcastEvent(event Event) {
 	}
 }
 
-
 /**
  * Define init function to run our liveSockets in a goroutine
  */
-func init(){
+func init() {
 	go liveSockets()
 }
 
 /**
  * Define the funcs that respond to particular routes.
  */
-func (this *LiveController) Join(){
+func (this *LiveController) Join() {
 	// Verify user is logged in, get session data.
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -189,7 +188,7 @@ func (this *LiveController) Join(){
 		return
 	}
 
-	// Join chat room.
+	// Join
 	Join(m["username"].(string), ws)
 	defer Leave(m["username"].(string))
 

@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"go.mbitson.com/models"
-	"github.com/astaxie/beego/orm"
-	"fmt"
-	"github.com/davecgh/go-spew/spew"
 	"encoding/json"
+	"fmt"
+	"github.com/astaxie/beego/orm"
+	"github.com/davecgh/go-spew/spew"
+	"github.com/mbitson/overseer/models"
 )
 
 // operations for Sites.Go
@@ -30,7 +30,7 @@ func (this *GroupsApiController) URLMapping() {
 func (this *GroupsApiController) Post() {
 
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -48,59 +48,58 @@ func (this *GroupsApiController) Post() {
 	o.Using("default")
 
 	// Insert group!
-	group := models.Group{User: &models.AuthUser{Id:m["id"].(int)}, Name: name, Contacts: contacts}
+	group := models.Group{User: &models.AuthUser{Id: m["id"].(int)}, Name: name, Contacts: contacts}
 	group_id, groupInsertError := o.Insert(&group)
 	this.logCustomActionAndId("Group.Create", int(group_id), m["id"].(int))
 
 	// If no error
 	if groupInsertError == nil {
 		this.Data["json"] = group
-	}else{
+	} else {
 		this.Data["json"] = "Error inserting group."
 	}
-	this.ServeJson()
+	this.ServeJSON()
 }
 func (this *GroupsApiController) SaveContacts() {
 
-//	// Load session data
-//	sess := this.GetSession("go.mbitson.com")
-//	if sess == nil {
-//		this.Redirect("/user/login/", 302)
-//		return
-//	}
-//
-//	// Map userdata to m
-//	m := sess.(map[string]interface{})
+	//	// Load session data
+	//	sess := this.GetSession("os-auth")
+	//	if sess == nil {
+	//		this.Redirect("/user/login/", 302)
+	//		return
+	//	}
+	//
+	//	// Map userdata to m
+	//	m := sess.(map[string]interface{})
 
 	var groups []models.Group
 	json.Unmarshal(this.Ctx.Input.RequestBody, &groups)
 	spew.Dump(this.Ctx.Input.RequestBody)
 
-
 	// Load orm
 	o := orm.NewOrm()
 	o.Using("default")
 
-	for _, group := range groups{
+	for _, group := range groups {
 		o.Update(&group)
 	}
 
 	// Insert group!
-//	group := models.Group{User: &models.AuthUser{Id:m["id"].(int)}, Name: name, Contacts: contacts}
-//	group_id, groupInsertError := o.Insert(&group)
-//	this.logCustomActionAndId("Group.Create", int(group_id), m["id"].(int))
+	//	group := models.Group{User: &models.AuthUser{Id:m["id"].(int)}, Name: name, Contacts: contacts}
+	//	group_id, groupInsertError := o.Insert(&group)
+	//	this.logCustomActionAndId("Group.Create", int(group_id), m["id"].(int))
 
 	// If no error
 	//if groupInsertError == nil {
-		this.Data["json"] = groups
-//	}else {
-//		this.Data["json"] = "Error Saving Groups."
-//	}
-	this.ServeJson()
+	this.Data["json"] = groups
+	//	}else {
+	//		this.Data["json"] = "Error Saving Groups."
+	//	}
+	this.ServeJSON()
 }
 
 func (this *GroupsApiController) Get() {
-	groupId := this.Ctx.Input.Params[":objectId"]
+	groupId := this.Ctx.Input.Param(":objectId")
 	if groupId != "" {
 		this.GetOne()
 	} else {
@@ -116,10 +115,10 @@ func (this *GroupsApiController) Get() {
 // @router /:id [get]
 func (this *GroupsApiController) GetOne() {
 	// Get Group ID
-	groupId := this.Ctx.Input.Params[":objectId"]
+	groupId := this.Ctx.Input.Param(":objectId")
 
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -133,10 +132,10 @@ func (this *GroupsApiController) GetOne() {
 	o.Using("default")
 
 	var groups models.Group
-	err := o.QueryTable("group").Filter("Id", groupId).Filter("User", &models.AuthUser{Id:m["id"].(int)}).One(&groups)
+	err := o.QueryTable("group").Filter("Id", groupId).Filter("User", &models.AuthUser{Id: m["id"].(int)}).One(&groups)
 	if err == orm.ErrNoRows {
 		this.ajaxContent("Failure")
-	}else{
+	} else {
 		this.ajaxContent(&groups)
 	}
 }
@@ -154,7 +153,7 @@ func (this *GroupsApiController) GetOne() {
 // @router / [get]
 func (this *GroupsApiController) GetAll() {
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -168,7 +167,7 @@ func (this *GroupsApiController) GetAll() {
 	o.Using("default")
 
 	var groups []models.Group
-	o.QueryTable("group").Filter("User", &models.AuthUser{Id:m["id"].(int)}).All(&groups)
+	o.QueryTable("group").Filter("User", &models.AuthUser{Id: m["id"].(int)}).All(&groups)
 	for i := 0; i < len(groups); i++ {
 		var contacts []models.Contact
 		o.Raw(fmt.Sprint("SELECT id, first, last, email, sms FROM contact WHERE id IN(", groups[i].Contacts, ")")).QueryRows(&contacts)
@@ -185,7 +184,7 @@ func (this *GroupsApiController) GetAll() {
 // @Failure 403 :id is not int
 // @router /:id [put]
 func (this *GroupsApiController) Put() {
-	
+
 }
 
 // @Title Delete
@@ -196,10 +195,10 @@ func (this *GroupsApiController) Put() {
 // @router /:id [delete]
 func (this *GroupsApiController) Delete() {
 	// Get Group ID
-	groupId := this.Ctx.Input.Params[":objectId"]
+	groupId := this.Ctx.Input.Param(":objectId")
 
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -212,6 +211,6 @@ func (this *GroupsApiController) Delete() {
 	o := orm.NewOrm()
 	o.Using("default")
 
-	o.QueryTable("group").Filter("User", &models.AuthUser{Id:m["id"].(int)}).Filter("Id", groupId).Delete()
+	o.QueryTable("group").Filter("User", &models.AuthUser{Id: m["id"].(int)}).Filter("Id", groupId).Delete()
 	this.ajaxContent("Success")
 }

@@ -1,16 +1,16 @@
 package controllers
 
 import (
-	"go.mbitson.com/models"
-	pk "go.mbitson.com/utilities/pbkdf2"
+	"crypto/tls"
 	"encoding/hex"
 	"fmt"
-	"gopkg.in/gomail.v1"
-	"crypto/tls"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
+	"github.com/mbitson/overseer/models"
+	pk "github.com/mbitson/overseer/utilities/pbkdf2"
 	"github.com/twinj/uuid"
+	"gopkg.in/gomail.v1"
 	"strings"
 	"time"
 )
@@ -18,7 +18,6 @@ import (
 type UserController struct {
 	MainController
 }
-
 
 func (this *UserController) Login() {
 	this.bareContent("user/login", "")
@@ -85,7 +84,7 @@ func (this *UserController) Login() {
 		m["timestamp"] = time.Now()
 
 		// Save user into session
-		this.SetSession("go.mbitson.com", m)
+		this.SetSession("os-auth", m)
 
 		// Log this login
 		this.logRouteAction(m["id"].(int))
@@ -97,7 +96,7 @@ func (this *UserController) Login() {
 
 func (this *UserController) Logout() {
 	// Load session data
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -113,7 +112,7 @@ func (this *UserController) Logout() {
 	this.logRouteAction(m["id"].(int))
 
 	// Delete session data for logged in user
-	this.DelSession("go.mbitson.com")
+	this.DelSession("os-auth")
 
 	// Redirect to homepage
 	this.Redirect("/", 302)
@@ -186,24 +185,26 @@ func (this *UserController) Register() {
 	}
 }
 
-func sendVerification(email, u string) bool{
+func sendVerification(email, u string) bool {
 	// Create a new message, configure headers.
 	msg := gomail.NewMessage()
-	msg.SetHeader("From", "mikelbitson@gmail.com")
+	msg.SetHeader("From", beego.AppConfig.String("email_from"))
 	msg.SetHeader("To", email)
-	msg.SetHeader("Subject", "Account Verification for go.mbitson.com")
+	msg.SetHeader("Subject", "Account Verification for "+beego.AppConfig.String("appname"))
 
 	// Build link and body
-	link := "http://go.mbitson.com/user/verify/" + u
-	msg.SetBody("text/html", "To verify your account, please click on the link: <a href=\""+link+
-				"\">"+link+"</a><br><br>Best Regards,<br>Mikel Bitson")
+	link := "http://" + beego.AppConfig.String("appname") + "/user/verify/" + u
+	msg.SetBody("text/html", "To verify your account, please click on the link: "+
+		"<a href=\""+link+"\">"+link+"</a><br><br>"+
+		"Best Regards,<br>"+beego.AppConfig.String("email_from_name"))
 
 	// Create mailer for our message
 	m := gomail.NewMailer(
-		"mbitson.com",
-		"go@mbitson.com",
-		"~paran01d~",
-		465, gomail.SetTLSConfig(&tls.Config{InsecureSkipVerify: true}),
+		beego.AppConfig.String("email_smtp_host"),
+		beego.AppConfig.String("email_smtp_user"),
+		beego.AppConfig.String("email_smtp_password"),
+		beego.AppConfig.DefaultInt("email_smtp_port", 465),
+		gomail.SetTLSConfig(&tls.Config{InsecureSkipVerify: true}),
 	)
 
 	// Attempt send
@@ -234,7 +235,7 @@ func (this *UserController) Profile() {
 	this.activeContent("user/profile", "")
 
 	//******** This page requires login
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -346,7 +347,7 @@ func (this *UserController) Remove() {
 	this.activeContent("user/remove", "")
 
 	//******** This page requires login
-	sess := this.GetSession("go.mbitson.com")
+	sess := this.GetSession("os-auth")
 	if sess == nil {
 		this.Redirect("/user/login/", 302)
 		return
@@ -404,7 +405,7 @@ func (this *UserController) Remove() {
 		if err == nil {
 			flash.Notice("Your account is deleted.")
 			flash.Store(&this.Controller)
-			this.DelSession("go.mbitson.com")
+			this.DelSession("os-auth")
 			this.Redirect("/notice", 302)
 		} else {
 			flash.Error("Internal error")

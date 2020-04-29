@@ -22,19 +22,8 @@
                     <md-button href="/#/site/{{site.Id}}/alerts" ng-class="{'md-nav-active': $state.is('site.alerts')}" ng-disabled="$state.is('site.alerts')">
                         Alerts
                     </md-button>
-                    <md-button href="/#/site/{{site.Id}}/cms" ng-class="{'md-nav-active': $state.is('site.cms')}" ng-disabled="$state.is('site.cms')">
-                        CMS
-                    </md-button>
-                    <md-button href="/#/site/{{site.Id}}/seo" ng-class="{'md-nav-active': $state.is('site.seo')}" ng-disabled="$state.is('site.seo')">
-                        SEO
-                    </md-button>
                 </div>
                 <span flex></span>
-                <div style="padding-right: 15px;">
-                    <div ng-if="$state.is('site.dashboard')">
-                        <input date-range-picker class="form-control date-picker" type="text" ng-model="runRequest.date" options="dateOptions" />
-                    </div>
-                </div>
             </md-toolbar>
         </div>
     </div>

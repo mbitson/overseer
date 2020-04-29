@@ -1,8 +1,8 @@
 package routers
 
 import (
-	"go.mbitson.com/controllers"
 	"github.com/astaxie/beego"
+	"github.com/mbitson/overseer/controllers"
 )
 
 func init() {

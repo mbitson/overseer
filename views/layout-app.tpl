@@ -1,3 +1,4 @@
+<<<.Head>>>
 <<<.Header>>>
 <<<.LayoutContent>>>
 <<<.Sidebar>>>

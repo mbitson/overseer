@@ -6,11 +6,11 @@ package pbkdf2
 */
 
 import (
-	_pbkdf2 "code.google.com/p/go.crypto/pbkdf2"
 	"crypto/rand"
 	"crypto/sha1"
 	"crypto/subtle"
 	"fmt"
+	_pbkdf2 "golang.org/x/crypto/pbkdf2"
 )
 
 var (
