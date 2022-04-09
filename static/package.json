@@ -37,7 +37,7 @@
     "bootstrap": "^3.3.5",
     "chart.js": "^1.0.1",
     "chosenjs": "^1.4.3",
-    "moment": "^2.9.0",
+    "moment": "^2.29.2",
     "oclazyload": "^1.0.1",
     "toastr": "^2.1.4"
   }
